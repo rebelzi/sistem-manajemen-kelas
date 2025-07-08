@@ -7,9 +7,6 @@
 
 using namespace std;
 
-// ==========================================================
-// STRUKTUR DATA UTAMA
-// ==========================================================
 
 struct Jadwal
 {
@@ -20,13 +17,10 @@ struct Jadwal
     string hari;
     string jam;
 
-    // Constructor
     Jadwal() : id(0) {}
     Jadwal(int _id, string _matkul, string _dosen, string _ruangan, string _hari, string _jam)
         : id(_id), matkul(_matkul), dosen(_dosen), ruangan(_ruangan), hari(_hari), jam(_jam) {}
 };
-
-// Node untuk Linked List (penyimpanan utama)
 struct Node
 {
     Jadwal data;
@@ -36,14 +30,14 @@ struct Node
     Node(Jadwal _data) : data(_data), next(NULL) {}
 };
 
-// Node untuk Graf (deteksi konflik)
+
 struct GraphNode
 {
     int jadwalId;
-    string resourceKey;            // "dosen_hari_jam" atau "ruangan_hari_jam"
-    GraphNode **conflicts;         // Array pointer ke jadwal yang konflik
-    int conflictCount;             // Jumlah konflik
-    int maxConflicts;              // Kapasitas array
+    string resourceKey;            
+    GraphNode **conflicts;         
+    int conflictCount;             
+    int maxConflicts;              
 
     GraphNode(int id, string key) : jadwalId(id), resourceKey(key), conflictCount(0), maxConflicts(10)
     {
@@ -64,17 +58,15 @@ struct GraphNode
     }
 };
 
-// ==========================================================
-// KELAS UTAMA: SISTEM MANAJEMEN JADWAL
-// ==========================================================
+
 
 class SistemManajemenJadwal
 {
 private:
-    Node *head;                             // Linked List untuk penyimpanan
-    int idCounter;                          // Counter untuk ID unik
-    map<string, GraphNode *> conflictGraph; // Graf untuk deteksi konflik
-    map<int, Jadwal> jadwalMap;             // Map untuk akses cepat berdasarkan ID
+    Node *head;                             
+    int idCounter;                          
+    map<string, GraphNode *> conflictGraph; 
+    map<int, Jadwal> jadwalMap;             
 
 public:
     SistemManajemenJadwal() : head(NULL), idCounter(1) {}
@@ -95,10 +87,6 @@ public:
             delete it->second;
         }
     }
-
-    // ==========================================================
-    // HELPER FUNCTIONS
-    // ==========================================================
 
     int waktuKeMenit(const string &waktuStr)
     {
@@ -151,10 +139,6 @@ public:
         return (mulai1 < selesai2) && (mulai2 < selesai1);
     }
 
-    // ==========================================================
-    // DETEKSI KONFLIK MENGGUNAKAN GRAF
-    // ==========================================================
-
     string* deteksiKonflikGraf(const Jadwal &jadwalBaru, int &konflikCount)
     {
         konflikCount = 0;
@@ -181,9 +165,9 @@ public:
                 if (cekTumpangTindihWaktu(jadwalBaru.jam, current->data.jam))
                 {
                     konflikDitemukan[konflikCount++] = "KONFLIK RUANGAN: " + jadwalBaru.ruangan +
-                                               " sudah digunakan untuk " + current->data.matkul +
-                                               " oleh " + current->data.dosen +
-                                               " pada " + current->data.jam;
+                                            " sudah digunakan untuk " + current->data.matkul +
+                                            " oleh " + current->data.dosen +
+                                            " pada " + current->data.jam;
                 }
             }
             current = current->next;
@@ -223,7 +207,6 @@ public:
                         if ((existingJadwal.dosen == jadwal.dosen || existingJadwal.ruangan == jadwal.ruangan) &&
                             cekTumpangTindihWaktu(jadwal.jam, existingJadwal.jam))
                         {
-                            // Tambah edge dua arah
                             conflictGraph[dosenKey]->addConflict(node);
                             node->addConflict(conflictGraph[dosenKey]);
                         }
@@ -233,12 +216,9 @@ public:
         }
     }
 
-    // ==========================================================
-    // CRUD OPERATIONS (CREATE, READ, UPDATE, DELETE)
-    // ==========================================================
 
     bool tambahJadwal(const string &matkul, const string &dosen, const string &ruangan,
-                      const string &hari, const string &jam)
+                    const string &hari, const string &jam)
     {
 
         Jadwal jadwalBaru(idCounter, matkul, dosen, ruangan, hari, jam);
@@ -291,7 +271,7 @@ public:
     void tampilkanSemuaJadwal()
     {
         cout << "\n"
-             << string(60, '=') << endl;
+            << string(60, '=') << endl;
         cout << "           DAFTAR SEMUA JADWAL KELAS" << endl;
         cout << string(60, '=') << endl;
 
@@ -319,7 +299,7 @@ public:
     }
 
     bool updateJadwal(int id, const string &matkul, const string &dosen, const string &ruangan,
-                      const string &hari, const string &jam)
+                    const string &hari, const string &jam)
     {
 
         // Cari jadwal yang akan diupdate
@@ -342,16 +322,12 @@ public:
             return false;
         }
 
-        // Simpan data lama
         Jadwal dataLama = targetNode->data;
 
-        // Buat jadwal baru untuk validasi
         Jadwal jadwalBaru(id, matkul, dosen, ruangan, hari, jam);
 
-        // Sementara hapus dari struktur untuk validasi
         jadwalMap.erase(id);
 
-        // Cek konflik
         int konflikCount = 0;
         string* konflik = deteksiKonflikGraf(jadwalBaru, konflikCount);
 
@@ -420,14 +396,10 @@ public:
         return true;
     }
 
-    // ==========================================================
-    // SEARCHING & SORTING MANUAL (TANPA VECTOR)
-    // ==========================================================
-
     void cariJadwal(const string &keyword)
     {
         cout << "\n"
-             << string(50, '=') << endl;
+            << string(50, '=') << endl;
         cout << "  HASIL PENCARIAN: '" << keyword << "'" << endl;
         cout << string(50, '=') << endl;
 
@@ -620,14 +592,10 @@ public:
         }
     }
 
-    // ==========================================================
-    // ANALISIS GRAF (FITUR TAMBAHAN)
-    // ==========================================================
-
     void analisisKonflik()
     {
         cout << "\n"
-             << string(60, '=') << endl;
+            << string(60, '=') << endl;
         cout << "           ANALISIS KONFLIK MENGGUNAKAN GRAF" << endl;
         cout << string(60, '=') << endl;
 
@@ -648,11 +616,11 @@ public:
 
         if (konflikPairs.empty())
         {
-            cout << "✅ Tidak ada konflik dalam jadwal saat ini." << endl;
+            cout << " Tidak ada konflik dalam jadwal saat ini." << endl;
         }
         else
         {
-            cout << "⚠️  Ditemukan " << konflikPairs.size() << " konflik:" << endl;
+            cout << "  Ditemukan " << konflikPairs.size() << " konflik:" << endl;
             for (set<pair<int, int> >::iterator it = konflikPairs.begin(); it != konflikPairs.end(); ++it)
             {
                 map<int, Jadwal>::iterator it1 = jadwalMap.find(it->first);
@@ -675,8 +643,8 @@ public:
 void tampilkanMenu()
 {
     cout << "\n"
-         << string(70, '=') << endl;
-    cout << "                     SISTEM MANAJEMEN JADWAL KELAS" << endl;
+        << string(70, '=') << endl;
+    cout << "                     SISTEM MANAJEMEN RUANGAN KELAS" << endl;
     cout << "        Menggunakan Linked List dan Graf untuk Deteksi Konflik" << endl;
     cout << string(70, '=') << endl;
     cout << "1. 📅 Tambah Jadwal Baru" << endl;
@@ -685,7 +653,7 @@ void tampilkanMenu()
     cout << "4. 🗑️  Hapus Jadwal" << endl;
     cout << "5. 🔍 Cari Jadwal" << endl;
     cout << "6. 📊 Urutkan Jadwal" << endl;
-    cout << "7. 🔗 Analisis Konflik (Graf)" << endl;
+    cout << "7. 🔗 Analisis Konflik" << endl;
     cout << "0. 🚪 Keluar" << endl;
     cout << string(70, '-') << endl;
     cout << "Pilihan Anda: ";
@@ -696,7 +664,7 @@ int main()
     SistemManajemenJadwal sistem;
     int pilihan;
 
-    cout << "\n🎓 Selamat datang di Aplikasi Manajemen Jadwal Kelas!" << endl;
+    cout << "\n🎓 Selamat datang di Aplikasi Manajemen Ruangan Kelas!" << endl;
     cout << "   Sistem ini menggunakan Linked List untuk penyimpanan" << endl;
     cout << "   dan Graf untuk deteksi konflik secara otomatis." << endl;
 
@@ -794,12 +762,12 @@ int main()
             break;
 
         case 0:
-            cout << "\n🙏 Terima kasih telah menggunakan Sistem Manajemen Jadwal Kelas!" << endl;
+            cout << "\n Terima kasih telah menggunakan Sistem Manajemen Jadwal Kelas!" << endl;
             cout << "   Semoga membantu dalam mengelola jadwal dengan lebih efisien." << endl;
             break;
 
         default:
-            cout << "\n❌ Pilihan tidak valid. Silakan coba lagi." << endl;
+            cout << "\n Pilihan tidak valid. Silakan coba lagi." << endl;
             break;
         }
 
@@ -808,7 +776,7 @@ int main()
             cout << "\nTekan Enter untuk kembali ke menu...";
             cin.ignore();
             cin.get();
-            system("clear"); // Untuk macOS/Linux. Ganti dengan "cls" untuk Windows
+            system("clear");
         }
 
     } while (pilihan != 0);
